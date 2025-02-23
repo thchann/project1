@@ -516,8 +516,20 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-
-        util.raiseNotDefined()
+        min_diff = 100000
+        queue = util.Queue()
+        queue.push((problem.getStartState(), []))
+        visited = set()
+        while not queue.isEmpty():
+            state, path = queue.pop()
+            if problem.isGoalState(state):
+                    return path
+            if state not in visited:
+                visited.add(state)
+                for successor, action, _ in problem.getSuccessors(state):
+                    if successor not in visited:
+                        queue.push((successor, path + [action]))
+        return []
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -553,8 +565,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        return 
-        util.raiseNotDefined()
+        isGoal = False
+        for f in self.food.asList():
+            x1,y1 = f
+            if (x1 == x and y1 == y):
+                isGoal = True
+        return isGoal
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
     """

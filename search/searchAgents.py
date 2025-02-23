@@ -453,7 +453,38 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    xy1 = position
+    average_diff = 1
+    all_diff = 0
+    max_diff = 0
+    def has_wall_between(pos1, pos2, walls):
+        x1, y1 = pos1
+        x2, y2 = pos2
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            if walls[x][y1]:
+                return True   
+        for y in range(min(y1, y2), max(y1, y2) + 1):
+            if walls[x2][y]:
+                return True  
+        return False
+
+    for foodpos in foodGrid.asList():
+        xy2 = foodpos
+        diff = mazeDistance(xy1, xy2, problem.startingGameState)
+
+        if has_wall_between(xy1, xy2, problem.walls):
+            diff *= 1.105
+            
+        all_diff += diff
+        if (diff > max_diff):
+            max_diff = diff
+
+    if len(foodGrid.asList()) == 0:
+        average_diff = 0
+    else:
+        average_diff = all_diff / len(foodGrid.asList())
+        
+    return 0.5*average_diff+0.5*max_diff
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -485,7 +516,20 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        min_diff = 100000
+        queue = util.Queue()
+        queue.push((problem.getStartState(), []))
+        visited = set()
+        while not queue.isEmpty():
+            state, path = queue.pop()
+            if problem.isGoalState(state):
+                    return path
+            if state not in visited:
+                visited.add(state)
+                for successor, action, _ in problem.getSuccessors(state):
+                    if successor not in visited:
+                        queue.push((successor, path + [action]))
+        return []
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -521,7 +565,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        isGoal = False
+        for f in self.food.asList():
+            x1,y1 = f
+            if (x1 == x and y1 == y):
+                isGoal = True
+        return isGoal
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
     """

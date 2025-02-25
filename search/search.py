@@ -39,7 +39,7 @@ class SearchProblem:
         """
           state: Search state
 
-        Returns True if and only if the state is a valid goal state.
+        Returns True if and only if the state is a valid goal state
         """
         util.raiseNotDefined()
 
